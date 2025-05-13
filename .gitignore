@@ -1,0 +1,10 @@
+# Ignore virtual environment
+rag_env/
+
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Optional: Ignore IDE/editor-specific files
+.vscode/
+
