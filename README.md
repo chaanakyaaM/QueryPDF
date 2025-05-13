@@ -9,7 +9,7 @@
 - Install dependencies:
 
 ```python
-pip install pypdf transformers sentence-transformers langchain chromadb ollama
+pip install pypdf transformers sentence-transformers langchain chromadb ollama colorama
 ```
 or 
 ```python
