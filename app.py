@@ -84,7 +84,7 @@ def ask_ollama(query):
     )
     print(Fore.YELLOW + '\nQuestion:\n', query)
     print()
-    print(Fore.GREEN + "💬 Response:\n", response["message"]["content"])
+    print(Fore.GREEN + "Response:\n", response["message"]["content"])
 
 # Main Loop for Chat with PDF
 while True:
