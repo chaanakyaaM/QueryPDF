@@ -1,5 +1,5 @@
 # 📘 LocalChat
-**LocalChat** is a privacy-focused, offline tool that lets you interact with PDF documents using natural language, completely offline. It extracts text from a PDF, breaks it into meaningful chunks, generates semantic embeddings, and stores them in a local vector database (ChromaDB). You can then ask questions, and it will retrieve relevant context and generate accurate, grounded answers using the lightweight gemma3:1b language model via Ollama.
+**LocalChat** is a privacy-focused RAG based offline tool that lets you interact with PDF documents using natural language, completely offline. It extracts text from a PDF, breaks it into meaningful chunks, generates semantic embeddings, and stores them in a local vector database (ChromaDB). You can then ask questions, and it will retrieve relevant context and generate accurate, grounded answers using the lightweight gemma3:1b language model via Ollama.
 
 
 
