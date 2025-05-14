@@ -1,72 +1,85 @@
-# 📘 QueryPDF
-**QueryPDF** is a privacy-focused RAG based offline tool that lets you interact with PDF documents using natural language, completely offline. It extracts text from a PDF, breaks it into meaningful chunks, generates semantic embeddings, and stores them in a local vector database. You can then ask questions, and it will retrieve relevant context and generate accurate, grounded answers using the lightweight large language model via Ollama.
+# QueryPDF
 
+**QueryPDF** is a privacy-focused, terminal based RAG tool that allows you to interact with PDF documents using natural language, completely offline. It extracts text from specified pages, chunks it intelligently, embeds the content, and stores it in a local vector database. Then, using an LLM served by ollama, it provides accurate, grounded responses to your queries — all without needing an internet connection.
 
+# ✅ Requirements
 
-# Requirements
-- Python 3.8+
+* Python 3.8+
+* Minimum 4GB RAM
 
-- Install dependencies:
-Run
-```python
-pip install pypdf transformers sentence-transformers langchain chromadb ollama colorama
+## 📦 Installation
+
+Install the dependencies:
+
+```bash
+pip install pypdf transformers sentence-transformers langchain chromadb ollama colorama yaspin
 ```
-or 
-```python
+
+Or using `requirements.txt`:
+
+```bash
 pip install -r requirements.txt
 ```
-- Download the gemma3:1b (815MB) model in ollama 
 
-- Ensure it by running ```ollama run gemma3:1b``` in the terminal
+## 📂 Project Structure
 
-# 📂 Project Structure
 ```
 project/
-├── sample.pdf          # Your input PDF file
-├── app.py              # Main script
-└── README.md           
+├── sample.pdf   # Your input PDF file
+├── app.py       # Main script
+└── README.md
 ```
 
-# ⚙️ How It Works
-- PDF Extraction: Extracts text from pages 16–25 of sample.pdf.
+## ⚙️ How It Works
 
-- Tokenization & Chunking: Splits the text into ~450-token chunks with overlap.
+1. **PDF Extraction:** Extracts text from specific pages (default: page 16 only).
 
-- Embedding: Encodes each chunk into a vector using intfloat/e5-small-v2.
+2. **Tokenization & Chunking:** Uses `intfloat/e5-small-v2` tokenizer to split the text into ~450-token chunks with 100-token overlaps.
 
-- Storage: Saves vectors and text chunks into a local ChromaDB.
+3. **Embeddings:** Creates Embeddings for each and every chunk using SentenceTransformers (`e5-small-v2`).
 
-- Chat Interface: Uses gemma3:1b to answer your questions based on relevant chunks.
+4. **Vector Storage:** Stores the embeddings and original text chunks in a local ChromaDB collection.
 
-# ▶️ Usage
-Place your sample.pdf in the root directory.
-Run the script:
-```
+5. **Chat Interface:** Accepts user queries, retrieves top 3 most relevant chunks, and feeds them into an Ollama-served LLM (`gemma3:1b`) for response generation.
+
+## ▶️ Usage
+1. Run the script:
+
+```bash
 python app.py
 ```
-Ask your questions interactively:
-```
+2. Paste the PDF destination path (including .pdf extension)
+3. Enter your question when prompted:
+
+```bash
 Chat with PDF: What is a PDF?
-💬 Response:
-[Model-generated answer]
+💬 Response: [Model-generated answer]
 ```
-- Type ```/exit``` to quit the chat.
 
-# ❗ Notes
-- Ensure Ollama is using ```gemma3:1b``` model.
+4. To exit the application, type:
 
-- Modify the ```reader.pages[15:25]``` line to adjust the page range as needed.
+```bash
+/exit
+```
 
-- Replace ```sample.pdf``` with your own file name.
+## 📝 Notes
+
+* You can adjust the PDF page range in this line of the code:
+
+```python
+pages = reader.pages[15:16]  # Change to desired page range like [10:25]
+```
+
+* The default model used is `gemma3:1b`, but you can swap it for another supported Ollama model based on your requirements and resources. Find more at [Ollama GitHub](https://github.com/ollama/ollama).
 
 
-# 🛠️ Tech Used
+## 🛠️ Technologies Used
 
-| Technology                                                 | Purpose                                                        |
-| ---------------------------------------------------------- | -------------------------------------------------------------- |
-| **[pypdf](https://pypi.org/project/pypdf/)**               | Extract text from PDF files                                    |
-| **[transformers](https://huggingface.co/transformers/)**   | Tokenization using pretrained models                           |
-| **[langchain](https://github.com/langchain-ai/langchain)** | Text chunking with recursive splitter                          |
-| **[sentence-transformers](https://www.sbert.net/)**        | Generate dense vector embeddings                               |
-| **[ChromaDB](https://www.trychroma.com/)**                 | Local vector database for storing and querying embeddings      |
-| **[Ollama](https://ollama.com/)**                          | Run local LLMs like `gemma3:1b` for chat-style responses       |
+| Technology | Purpose |
+|------------|---------|
+| [pypdf](https://pypi.org/project/pypdf/) | Extract text from PDF files |
+| [transformers](https://huggingface.co/docs/transformers/index) | Tokenization using pretrained models |
+| [langchain](https://python.langchain.com/docs/introduction/) | Text chunking with recursive character splitter |
+| [sentence-transformers](https://www.sbert.net/) | Generate dense vector embeddings |
+| [ChromaDB](https://www.trychroma.com/) | Store and query embeddings locally |
+| [Ollama](https://ollama.com/) | Run open-source LLMs locally |
