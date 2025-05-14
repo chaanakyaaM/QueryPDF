@@ -15,13 +15,19 @@ from sentence_transformers import SentenceTransformer
 # Initialize colorama
 init(autoreset=True)
 
-
-
 # Function to handle graceful exit
 def graceful_exit(message=None, exit_code=1):
     if message:
         print(Fore.RED + f"{message}")
     sys.exit(exit_code)
+
+# Connect to ChromaDB
+try:
+    client = chromadb.Client()
+    collection = client.get_or_create_collection("my_chunks")
+except Exception as e:
+    graceful_exit(f"• Error occurred while connecting to ChromaDB: {e}")
+
     
 # Ensure ChromaDB collection is deleted on exit/KeyboardInterrupt
 def cleanup():
@@ -59,6 +65,7 @@ except FileNotFoundError:
     graceful_exit( "• File not found. Please check the file path.")
 
 try:
+    # Get the page range from the user
     page_range_input = input("Enter the page range (e.g., 15-25): ")
     start_page, end_page = map(int, page_range_input.split('-'))
     pages = reader.pages[start_page:end_page]  
@@ -92,7 +99,7 @@ except Exception as e:
 # --- Step 4: Generate embeddings ---
 try:
     print(Fore.YELLOW + "• Generating embeddings...")
-    model = SentenceTransformer("intfloat/e5-small-v2")
+    model = SentenceTransformer(embedding_model)
     embeddings = model.encode([f"passage: {chunk}" for chunk in chunks], show_progress_bar=True)
     print(Fore.GREEN + "• Embeddings generated.")
 
@@ -112,7 +119,8 @@ try:
     print(Fore.GREEN + "• Data stored in ChromaDB.")
 
 except Exception as e:
-    graceful_exit(f"• Error occurred while connecting to chromadb: {e}")
+    graceful_exit(f"• Error occurred while adding the embeddings to ChromaDB: {e}")
+    
 
 # --- Step 6: Chat with the PDF ---
 def ask_ollama(query):
