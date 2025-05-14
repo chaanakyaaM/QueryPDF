@@ -1,9 +1,13 @@
+import os
+import sys
 import uuid
-from yaspin import yaspin 
+import json
+import atexit
 import chromadb
+from yaspin import yaspin 
 from ollama import chat
-from pypdf import PdfReader
 from colorama import Fore, init
+from pypdf import PdfReader
 from transformers import AutoTokenizer
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from sentence_transformers import SentenceTransformer
@@ -12,27 +16,64 @@ from sentence_transformers import SentenceTransformer
 init(autoreset=True)
 
 
+
+# Function to handle graceful exit
+def graceful_exit(message=None, exit_code=1):
+    if message:
+        print(Fore.RED + f"{message}")
+    sys.exit(exit_code)
+    
+# Ensure ChromaDB collection is deleted on exit/KeyboardInterrupt
+def cleanup():
+    try:
+        client.delete_collection("my_chunks")
+        print(Fore.RED + "• Collection 'my_chunks' deleted on exit.")
+    except:
+        pass  # Avoid raising further errors during exit
+atexit.register(cleanup)
+
+
+# Load configuration from JSON file
+def load_config(config_file="config.json"):
+    try:
+        with open(config_file, 'r') as file:
+            config = json.load(file)
+        return config
+    except FileNotFoundError:
+        graceful_exit(f"• Configuration file '{config_file}' not found.")
+
+# Load config
+config = load_config()
+embedding_model = config["embedding_model"]
+ollama_model = config["ollama_model"]
+chunk_size = config["chunk_size"]
+chunk_overlap = config["chunk_overlap"]
+
 # --- Step 1: Extract text from PDF ---
 try:
-    pdf_path = input("Paste the PDF path: ")
+    pdf_path = input("Paste the PDF path: ").strip()
     reader = PdfReader(pdf_path)  
     print(Fore.GREEN + "• PDF loaded successfully.")
 
 except FileNotFoundError:
-    print(Fore.RED + "• File not found. Please check the file path.")
+    graceful_exit( "• File not found. Please check the file path.")
 
+try:
+    page_range_input = input("Enter the page range (e.g., 15-25): ")
+    start_page, end_page = map(int, page_range_input.split('-'))
+    pages = reader.pages[start_page:end_page]  
+    print(Fore.GREEN + f"• Extracted text from {start_page} to {end_page}.")
+    corpus_data = '\n'.join([page.extract_text() or "" for page in pages])
+except Exception as e:
+    graceful_exit(f"• Error occurred while extracting text {e}")
 
-pages = reader.pages[15:16]  # Adjust the range of pages as needed like [10:100]
-corpus_data = '\n'.join([page.extract_text() or "" for page in pages])
-
-print(Fore.GREEN + f"• Extracted text from pages 15 to 25.")
 
 # --- Step 2: Tokenizer for chunking ---
 try:
-    tokenizer = AutoTokenizer.from_pretrained("intfloat/e5-small-v2")
+    tokenizer = AutoTokenizer.from_pretrained(embedding_model)
 
 except Exception as e:
-    print(Fore.RED + f'• Error loading tokenizer: {e}')
+    graceful_exit(f'• Error loading tokenizer: {e}')
 
 def tiktoken_len(text):
     return len(tokenizer.encode(text, truncation=True, max_length=tokenizer.model_max_length))
@@ -40,12 +81,12 @@ def tiktoken_len(text):
 
 # --- Step 3: Split into chunks ---
 try:
-    splitter = RecursiveCharacterTextSplitter(chunk_size=450, chunk_overlap=100, length_function=tiktoken_len)
+    splitter = RecursiveCharacterTextSplitter(chunk_size=chunk_size, chunk_overlap=chunk_overlap, length_function=tiktoken_len)
     chunks = splitter.split_text(corpus_data)
     print(Fore.GREEN + f"• Text split into {len(chunks)} chunks.")
 
 except Exception as e:
-    print(Fore.RED + f'• Error occurred while splitting text: {e}')
+    graceful_exit(f'• Error occurred while splitting text: {e}')
 
 
 # --- Step 4: Generate embeddings ---
@@ -56,7 +97,7 @@ try:
     print(Fore.GREEN + "• Embeddings generated.")
 
 except Exception as e:
-    print(Fore.RED + f'• Error occurred while generating embeddings: {e}')
+    graceful_exit( f'• Error occurred while generating embeddings: {e}')
 
 
 # --- Step 5: Store in ChromaDB ---
@@ -71,8 +112,7 @@ try:
     print(Fore.GREEN + "• Data stored in ChromaDB.")
 
 except Exception as e:
-    print(Fore.RED + f"• Error occurred while connecting to chromadb: {e}")
-
+    graceful_exit(f"• Error occurred while connecting to chromadb: {e}")
 
 # --- Step 6: Chat with the PDF ---
 def ask_ollama(query):
@@ -89,7 +129,7 @@ def ask_ollama(query):
                         respond only in plain text (no markdown)."""
 
             response = chat(
-                model="gemma3:1b",
+                model=ollama_model,
                 messages=[{"role": "user", "content": prompt}]
             )
 
@@ -97,8 +137,7 @@ def ask_ollama(query):
 
         except Exception as e:
             spinner.fail("✖")
-            print(Fore.RED + f"• Error during query or chat: {e}")
-            return
+            graceful_exit(f"• Error during generating the response: {e}")
 
     print(Fore.YELLOW + '\nQuestion:\n', query)
     print()
@@ -106,12 +145,14 @@ def ask_ollama(query):
 
 
 # Main Loop for Chat with PDF
-while True:
-    query = input("Chat with PDF : ")
-    if query.lower() == '/exit':
-        # Detete the collection to free up disk space
-        client.delete_collection("my_chunks")
-        print(Fore.RED + "Exiting program.")
-        break
-    else:
-        ask_ollama(query)
+try:
+    while True:
+        query = input("Chat with PDF : ")
+        if query.lower() == '/exit':
+            print(Fore.RED + "Exiting program.")
+            break
+        else:
+            ask_ollama(query)
+
+finally:
+    cleanup() 
