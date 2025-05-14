@@ -10,6 +10,16 @@
 
 ## 📦 Installation
 
+Create a virtual environment using:
+
+```bash
+python -m venv <environment-name>
+```
+Activate the virtual environment:
+
+```bash
+./<environment-name>/scripts/activate
+```
 Install the dependencies:
 
 ```bash
@@ -26,9 +36,11 @@ pip install -r requirements.txt
 
 ```
 project/
-├── config.json  # Configuration file
-├── app.py       # Main script
-└── README.md
+├── config.json         # Configuration file
+├── app.py              # Main script
+├── sample.pdf          # Example PDF for testing
+├── requirements.txt    # Package dependencies
+└── README.md           # Documentation
 ```
 
 ## ⚙️ Configuration

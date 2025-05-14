@@ -120,7 +120,7 @@ try:
 
 except Exception as e:
     graceful_exit(f"• Error occurred while adding the embeddings to ChromaDB: {e}")
-    
+
 
 # --- Step 6: Chat with the PDF ---
 def ask_ollama(query):
@@ -157,7 +157,7 @@ try:
     while True:
         query = input("Chat with PDF : ")
         if query.lower() == '/exit':
-            print(Fore.RED + "Exiting program.")
+            print(Fore.RED + "• Exiting program.")
             break
         else:
             ask_ollama(query)
