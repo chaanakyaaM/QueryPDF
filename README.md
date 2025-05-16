@@ -57,9 +57,10 @@ The application uses a `config.json` file with the following parameters:
 ```
 
 You can modify these settings to adjust:
-- The embedding model used for semantic search(you can find embedding models [hugging face](https://huggingface.co/))
-- The Ollama LLM model used for response generation as per your requirements and resources (you can find ollama models on [Ollama github page](https://github.com/ollama/ollama))
-- Chunk size and overlap for text splitting
+- The embedding model used for semantic search (you can find embedding models on [hugging face](https://huggingface.co/)) .
+- The Ollama LLM model used for response generation as per your requirements and resources (you can find ollama models on [Ollama github page](https://github.com/ollama/ollama)) .
+- Make sure to install the required LLM model by running ```ollama run <model-name>``` in the terminal -- This installs the model locally .
+- Chunk size and overlap for text splitting as per the model .
 
 ## ⚙️ How It Works
 

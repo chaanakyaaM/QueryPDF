@@ -122,34 +122,44 @@ except Exception as e:
     graceful_exit(f"• Error occurred while adding the embeddings to ChromaDB: {e}")
 
 
-# --- Step 6: Chat with the PDF ---
+# --- Step 6: Chat with PDF ---
 def ask_ollama(query):
-    with yaspin(text="Generating response...", color="cyan") as spinner:
-        try:
+    print(Fore.YELLOW + '\n• Question:\n', query)
+    print()
+    print(Fore.GREEN + "• Response:")
+
+    try:
+        with yaspin(text="Generating response...", color="cyan") as spinner:
             results = collection.query(query_texts=[f"query: {query}"], n_results=3)
             context = "\n\n".join(results["documents"][0])
 
             prompt = f"""Using the provided context, answer the following question as clearly and accurately as possible. Ensure your response directly addresses the question, without any additional or unnecessary information. Refer to the context for specific details, and make sure your answer is grounded in it.
-                        Context:
-                        {context}
-                        Question:
-                        {query}
-                        respond only in plain text (no markdown)."""
+                        Context:{context} Question:{query} respond only in plain text (no markdown)."""
 
             response = chat(
                 model=ollama_model,
-                messages=[{"role": "user", "content": prompt}]
+                messages=[{"role": "user", "content": prompt}],
+                stream=True
             )
 
-            spinner.ok("✔")
+            first_chunk_printed = False
+            for chunk in response:
+                content = chunk.get("message", {}).get("content", "")
+                if content:
+                    if not first_chunk_printed:
+                        spinner.ok("✔")
+                        first_chunk_printed = True
+                    print(content, end="", flush=True)
 
-        except Exception as e:
-            spinner.fail("✖")
-            graceful_exit(f"• Error during generating the response: {e}")
+            if not first_chunk_printed:
+                spinner.fail("✖")
+                graceful_exit("• No content received from model.")
 
-    print(Fore.YELLOW + '\nQuestion:\n', query)
-    print()
-    print(Fore.GREEN + "Response:\n", response["message"]["content"])
+            print()  # newline after full response
+
+    except Exception as e:
+        graceful_exit(f"• Error while streaming response: {e}")
+
 
 
 # Main Loop for Chat with PDF
