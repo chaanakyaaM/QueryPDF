@@ -1,3 +1,5 @@
+.gitignore
+
 # Ignore virtual environment
 rag_env/
 
@@ -8,5 +10,5 @@ __pycache__/
 # Optional: Ignore IDE/editor-specific files
 .vscode/
 
-/uv.lock
+uv.lock
 
