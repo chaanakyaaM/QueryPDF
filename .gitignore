@@ -8,3 +8,5 @@ __pycache__/
 # Optional: Ignore IDE/editor-specific files
 .vscode/
 
+uv.lock
+
