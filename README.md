@@ -1,14 +1,14 @@
 # QueryPDF
 
-**QueryPDF** is a privacy-focused, terminal-based RAG tool that allows you to interact with PDF documents using natural language, completely offline. It extracts text from user-specified pages, chunks it intelligently, embeds the content, and stores it in a local vector database. Then, using an LLM served by Ollama, it provides accurate, grounded responses to your queries — all without needing an internet connection.
+**QueryPDF** is a privacy-focused, terminal-based RAG tool that allows you to interact with PDF documents using natural language, completely offline. It extracts text from user-specified pages, chunks it intelligently, embeds the content, and stores it in a local vector database. Then, using an LLM served by Ollama, it provides accurate, grounded responses to your queries — all without any internet connection.
 
 ## 🔍 Features
 
-- **Privacy**: All processing happens on your machine, no data leaves your system
-- **Interactive Page Selection**: Specify which pages to analyze at runtime
-- **Graceful Exit Handling**: Automatically cleans up ChromaDB collections on exit
-- **Visual Progress Feedback**: Shows embedding generation progress
-- **Context-Aware Responses**: Uses semantic search to find the most relevant chunks for your questions
+- **Privacy**: All processing happens on your machine, no data leaves your system.
+- **Interactive Page Selection**: Specify which pages to analyze at runtime.
+- **Graceful Exit Handling**: Automatically cleans up ChromaDB collections on exit.
+- **Visual Progress Feedback**: Shows embedding generation progress.
+- **Context-Aware Responses**: Uses semantic search to find the most relevant chunks for your questions.
 
 ## 🛠️ Technologies Used
 
@@ -23,9 +23,8 @@
 
 ## ✅ Requirements
 
-* Python 3.8+
-* Minimum 4GB RAM
-* Ollama installed
+* Python 3.10+
+* Ollama 
 
 ## 📦 Installation
 
