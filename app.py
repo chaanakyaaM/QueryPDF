@@ -116,7 +116,7 @@ def ask_ollama(query):
             context = "\n\n".join(results["documents"][0])
 
             prompt = (
-                f"Using the provided context, answer the question clearly and directly.\n"
+                f"Using the provided context, answer the question clearly.\n"
                 f"Context: {context}\nQuestion: {query}\nRespond in plain text only."
             )
 
@@ -155,6 +155,8 @@ def main():
             print(Fore.RED + "• Exiting.")
             break
         ask_ollama(query)
+
+# === Driver Code ===
 
 if __name__ == "__main__":
     main()
