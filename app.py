@@ -116,8 +116,8 @@ def ask_ollama(query):
             context = "\n\n".join(results["documents"][0])
 
             prompt = (
-                f"Using the provided context, answer the question clearly.\n"
-                f"Context: {context}\nQuestion: {query}\nRespond in plain text only."
+                f"Using the provided context, answer the question clearly and accurately.\n"
+                f"Context: {context}\nQuestion: {query}\nRespond in plain text only without using any markdown."
             )
 
             response = chat(model=ollama_model, messages=[{"role": "user", "content": prompt}], stream=True)
