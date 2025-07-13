@@ -5,6 +5,7 @@
 ## 🔍 Features
 
 - **Privacy**: All processing happens on your machine, no data leaves your system.
+- **Local Caching**: Caches both tokenizers and embedding models locally for offline use and faster future runs.
 - **Interactive Page Selection**: Specify which pages to analyze at runtime.
 - **Graceful Exit Handling**: Automatically cleans up ChromaDB collections on exit.
 - **Visual Progress Feedback**: Shows embedding generation progress.
@@ -25,8 +26,11 @@
 ## ✅ Requirements
 
 * Python 3.10+
-* Ollama 
-- Install ollama and run ```ollama run gemma3:1b``` in the terminal.
+* Ollama  
+  - Install Ollama and run:  
+    ```bash
+    ollama run gemma3:1b
+    ```
 
 ## 📦 Installation
 
@@ -128,3 +132,10 @@ Chat with PDF: /exit
 4. **Vector Storage:** Stores the embeddings and original text chunks in a local ChromaDB collection.
 
 5. **Chat Interface:** Accepts user queries, retrieves the top 3 most relevant chunks, and feeds them into an Ollama-served LLM (default: `gemma3:1b`) for response generation.
+
+## 📁 Local Model Caching
+To ensure full offline capability and improve performance, QueryPDF automatically saves required models locally:
+
+- 🧠 **Tokenizer**: On first run, the Hugging Face tokenizer (transformers.AutoTokenizer) is downloaded and saved to a local_tokenizer/ directory. Subsequent runs will use this local tokenizer even without an internet connection.
+
+- 🔤 **Embedding Model**: The embedding model (e.g., intfloat/e5-small-v2) is saved locally under local_e5_small_v2/ on the first run. If the model is already cached, it will be reused without redownloading.

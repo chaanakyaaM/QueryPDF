@@ -67,6 +67,15 @@ def extract_text_from_pdf():
     except Exception as e:
         graceful_exit(f"Error extracting text: {e}")
 
+# === Tokenizer Loading (Local-First) ===
+def load_tokenizer():
+    try:
+        tokenizer = AutoTokenizer.from_pretrained(embedding_model)
+        tokenizer.save_pretrained("local_tokenizer")
+    except:
+        tokenizer = AutoTokenizer.from_pretrained("local_tokenizer")
+    return tokenizer
+
 # === Text Chunking ===
 def split_text(corpus, tokenizer):
     try:
@@ -79,11 +88,16 @@ def split_text(corpus, tokenizer):
     except Exception as e:
         graceful_exit(f"Error splitting text: {e}")
 
-# === Embedding Generation ===
+# === Embedding Generation (Local-First) ===
 def generate_embeddings(chunks):
     try:
         print(Fore.YELLOW + "• Generating embeddings...")
-        model = SentenceTransformer(embedding_model)
+        try:
+            model = SentenceTransformer(embedding_model)
+            model.save("local_e5_small_v2")
+        except:
+            model = SentenceTransformer("local_e5_small_v2")
+
         embeddings = model.encode(
             [f"passage: {chunk}" for chunk in chunks],
             show_progress_bar=True
@@ -138,11 +152,7 @@ def ask_ollama(query):
 def main():
     corpus_data = extract_text_from_pdf()
 
-    try:
-        tokenizer = AutoTokenizer.from_pretrained(embedding_model)
-    except Exception as e:
-        graceful_exit(f"Failed to load tokenizer: {e}")
-
+    tokenizer = load_tokenizer()
     chunks = split_text(corpus_data, tokenizer)
     print(Fore.GREEN + f"• Split into {len(chunks)} chunks.")
 
@@ -157,6 +167,5 @@ def main():
         ask_ollama(query)
 
 # === Driver Code ===
-
 if __name__ == "__main__":
     main()
